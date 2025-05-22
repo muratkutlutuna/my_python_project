@@ -85,12 +85,14 @@ Murat Kutlu"""
             # Update the sheet with "Yes" and timestamp
             sheet.update_cell(sheet_row_index, sent_col_idx, "Yes")
             sheet.update_cell(sheet_row_index, timestamp_col_idx, timestamp_now)
-            send_slack_message(f"✅ Email sent to {recipient_email} at {timestamp_now}")
+            send_slack_message(f"✅ Email sent to {name} ({recipient_email}) at {timestamp_now}")
         except Exception as e:
             print(f"❌ Failed to send email to {name} ({recipient_email}): {e}")
-            send_slack_message(f"❌ Failed to send email to {recipient_email}: {str(e)}")
+            send_slack_message(f"❌ Failed to send email to {name} ({recipient_email}): {str(e)}")
     else:
         if sent_timestamp:
             print(f"ℹ️ Already sent to {name} at {recipient_email} on {sent_timestamp}")
+            send_slack_message(f"ℹ️ Already sent {name} to {recipient_email} on {sent_timestamp}")
         else:
             print(f"⚠️ Already sent to {name} at {recipient_email}, but no timestamp recorded.")
+            send_slack_message(f"⚠️ Already sent {name} to {recipient_email}, but no timestamp recorded.")
