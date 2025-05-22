@@ -1,0 +1,6 @@
+.env
+
+/venv
+
+/api_docs
+api_docs/*.json
