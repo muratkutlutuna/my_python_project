@@ -17,6 +17,9 @@ client = gspread.authorize(creds)
 sheet = client.open("İletişim bilgileri (Yanıtlar)").sheet1
 data = sheet.get_all_records()
 
+# Get number of columns to calculate the "Email Sent?" column index
+header_row = sheet.row_values(1)
+sent_column_index = len(header_row) + 1  # e.g. 6 if you had 5 columns
 
 def send_email(to_email, subject, body):
     from_email = email
@@ -34,13 +37,30 @@ def send_email(to_email, subject, body):
 subject = "Thanks for you to filling the form!"
 
 
-for row in data:
-    body = f"""Dear {row["Name, Surname"]},
+for index, row in enumerate(data, start=2):
+    name = row["Name, Surname"]
+    recipient_email = row["email address"]
+    email_sent_flag = row.get("Email Sent?")
+
+    if email_sent_flag == "Yes":
+        print(f"Skipping {name} ({recipient_email}) - already sent.")
+        continue
+
+    # Email content
+    body = f"""Dear {name},
 
 Thanks for you to filling the form!
 
 Best regards,
 Murat Kutlu"""
-    send_email(row["email address"],subject,body)  # Adjust these keys according to your form
+    # Send the email
+    try:
+        send_email(recipient_email, subject, body)
+        print(f"Email sent to {name} at {recipient_email}.")
 
+        # Mark the email as sent in the Google Sheet
+        sheet.update_cell(index, sent_column_index, "Yes")
+
+    except Exception as e:
+        print(f"❌ Failed to send email to {name} ({recipient_email}): {e}")
 
