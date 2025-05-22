@@ -20,6 +20,7 @@ slack_client = WebClient(token=slack_token)
 def send_slack_message(message):
     try:
         slack_client.chat_postMessage(channel=slack_channel, text=message)
+        print(f"Slack message sent: {message}")
     except SlackApiError as e:
         print(f"Slack error: {e.response['error']}")
 
