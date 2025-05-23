@@ -1,66 +1,184 @@
-# My Python Project
+# 📨 Google Sheet Auto Mailer (Cron-Based Python App)
 
-This project automates sending emails from a Google Excel file using a Python script scheduled with `cron`.
+This Python project reads a Google Sheets spreadsheet, sends personalized emails to listed contacts, and logs the status back to the sheet. It's designed to run automatically every 10 minutes via a scheduled cron job.
 
 ---
 
-## Setup & Environment
+## 📁 Project Structure
 
-### 1. Clone the repository
+```bash
+.
+├── .env                    # Stores sensitive environment variables
+├── .gitignore             # Ignores secrets, logs, virtual env, etc.
+├── LICENSE                # MIT License file
+├── README.md              # You're reading it
+├── requirements.txt       # Python packages required
+├── send_email_from_google_excel.py  # Main script
+├── api_docs/              # Google API credentials (ignored in git)
+├── log/                   # Cron log output
+│   └── cronlog.txt
+├── venv/                  # Python virtual environment (ignored in git)
+```
+
+---
+
+
+
+## 🛠 Setup Instructions
+
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/muratkutlutuna/my_python_project.git
 cd my_python_project
 ```
 
-### 2. Create and activate a Python virtual environment
+---
+
+### 2. Create and Activate a Virtual Environment
+
 ```bash
 python3 -m venv venv
-source venv/bin/activate    # On macOS/Linux
+source venv/bin/activate  # On macOS/Linux
 # For Windows use: venv\Scripts\activate
 ```
-### 3. Install dependencies
+
+---
+
+### 3. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
-> Make sure your requirements.txt includes all necessary packages your script uses (e.g., google-api-python-client, pandas, etc.).
 
-### 4. Environment variables
+---
 
--If your script needs environment variables (like Google API credentials), create a .env file in the root and add the required keys.
+### 4. Add Environment Variables
+
+Create a `.env` file in the root directory:
 
 ```bash
-# Example .env content:
-GOOGLE_API_KEY=your_api_key_here
-OTHER_SECRET=your_secret_here
+touch .env
 ```
-## Cron Job Setup
 
-> To automate running the script every 10 minutes and log output, add this line to your crontab:
-```bash
-*/10 * * * * /Users/muratkutlutuna/Documents/python_projects/my_python_project/venv/bin/python /Users/muratkutlutuna/Documents/python_projects/my_python_project/send_email_from_google_excel.py >> /Users/muratkutlutuna/Documents/python_projects/my_python_project/log/cronlog.txt 2>&1
+Add the following content (replace values accordingly):
+
+```env
+MY_EMAIL=your_email@gmail.com
+MY_PASSWORD=your_email_app_password
+JSON_PATH=/full/path/to/api_docs/your_google_api_credentials.json
+SLACK_BOT_TOKEN=xoxb-xxx-your-token-here
+SLACK_CHANNEL=#automation-logs
 ```
-### How to edit your crontab:
+
+💡 Tip: Use `absolute paths` for things like `JSON_PATH`.
+
+---
+
+### 5. Add Your Google API Credentials
+
+- Visit the [Google Cloud Console](https://console.cloud.google.com/)
+- Enable the **Google Sheets API** and **Google Drive API**
+- Create a service account and download the `.json` key
+- Save the file to `api_docs/` and update your `.env` accordingly
+
+---
+
+
+
+## 🕰 Cron Job Setup
+
+🛑 Important:
+
+- Use **absolute paths** for Python and your script.
+- Make sure the script is executable:  
+  ```bash
+  chmod +x send_email_from_google_excel.py
+  ```
+- Ensure the `log/` folder exists:
+  ```bash
+  mkdir -p log
+  ```
+
+To run the script automatically every 10 minutes:
+
+1. Open your crontab:
+
 ```bash
 crontab -e
 ```
-> This opens your cron table in an editor. Paste the line above at the end of the file and save.
 
-## Important Notes
+2. Add the following line (change paths if needed):
 
-- Ensure the log/ directory exists, or create it so the log file can be written:
 ```bash
-mkdir -p /Users/muratkutlutuna/Documents/python_projects/my_python_project/log
+*/10 * * * * /Users/muratkutlutuna/Documents/python_projects/my_python_project/venv/bin/python /Users/muratkutlutuna/Documents/python_projects/my_python_project/send_email_from_google_excel.py >> /Users/muratkutlutuna/Documents/python_projects/my_python_project/log/cronlog.txt 2>&1
 ```
-- Use absolute paths for both the Python interpreter and your script in the crontab to avoid environment/path issues.
-- Check *cronlog.txt* periodically to see any errors or output from the script.
 
-## Troubleshooting
-- If the cron job does not run, check:
-    - That the Python path is correct (`/Users/muratkutlutuna/Documents/python_projects/my_python_project/venv/bin/python`)
-    - The script has executable permissions.
-    - Cron logs for errors (`/var/log/syslog` or `/var/log/cron.log` depending on your system).
+---
 
-## License
+
+
+## 🧪 Testing
+
+Run the script manually to make sure it works:
+
+```bash
+source venv/bin/activate
+python send_email_from_google_excel.py
+```
+
+Check:
+
+- Console output
+- Emails received
+- Google Sheet updated
+- `log/cronlog.txt` for cron output
+
+---
+
+
+
+## 🧠 Troubleshooting
+
+- **Script doesn’t run via cron?**  
+  - Log environment: `env > /tmp/env.output` inside your cron command to debug
+  - Check cron logs: `grep CRON /var/log/system.log` (macOS)
+- **Missing dependencies?**  
+  Reinstall:
+  ```bash
+  pip install -r requirements.txt
+  ```
+
+- **Invalid credentials or access denied?**
+  - Double-check service account email is shared with the Google Sheet.
+  - Verify `.env` paths.
+
+---
+
+
+
+## ✅ Features
+
+- Sends emails only if not already sent
+- Updates Google Sheet with timestamp and status
+- Posts success/failure messages to Slack
+- Logs everything to a local file
+
+---
+
+
+
+## 📜 License
 
 This project is licensed under the [MIT License](LICENSE).
+
+---
+
+
+
+## 🤝 Contributing
+
+Pull requests are welcome. For major changes, open an issue first to discuss what you'd like to change.
+
+
+---
