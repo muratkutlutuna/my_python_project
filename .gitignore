@@ -1,5 +1,7 @@
 .env
 
+cronlog.txt
+
 /venv
 
 /api_docs
