@@ -1,6 +1,7 @@
 .env
 
-cronlog.txt
+log/*.txt
+/log
 
 /venv
 
